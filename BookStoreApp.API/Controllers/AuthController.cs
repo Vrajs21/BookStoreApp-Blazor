@@ -1,7 +1,4 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using AutoMapper;
+﻿using AutoMapper;
 using BookStoreApp.API.Data;
 using BookStoreApp.API.Models.User;
 using BookStoreApp.API.Static;
@@ -10,8 +7,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-
-
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace BookStoreApp.API.Controllers
 {
@@ -20,16 +18,16 @@ namespace BookStoreApp.API.Controllers
     [AllowAnonymous]
     public class AuthController : ControllerBase
     {
-       private readonly ILogger<AuthController> Logger;
-        private readonly UserManager<ApiUser> userManager;
+        private readonly ILogger<AuthController> logger;
         private readonly IMapper mapper;
+        private readonly UserManager<ApiUser> userManager;
         private readonly IConfiguration configuration;
-        public AuthController(ILogger<AuthController> logger, UserManager<ApiUser> userManager, IMapper mapper, IConfiguration configuration)
 
+        public AuthController(ILogger<AuthController> logger, IMapper mapper, UserManager<ApiUser> userManager, IConfiguration configuration)
         {
+            this.logger = logger;
             this.mapper = mapper;
             this.userManager = userManager;
-            Logger = logger;
             this.configuration = configuration;
         }
 
@@ -37,7 +35,7 @@ namespace BookStoreApp.API.Controllers
         [Route("register")]
         public async Task<IActionResult> Register(UserDto userDto)
         {
-            Logger.LogInformation($"Registration Attempt for {userDto.Email} ");
+            logger.LogInformation($"Registration Attempt for {userDto.Email} ");
             try
             {
                 var user = mapper.Map<ApiUser>(userDto);
@@ -58,7 +56,7 @@ namespace BookStoreApp.API.Controllers
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, $"Something Went Wrong in the {nameof(Register)}");
+                logger.LogError(ex, $"Something Went Wrong in the {nameof(Register)}");
                 return Problem($"Something Went Wrong in the {nameof(Register)}", statusCode: 500);
             }
         }
@@ -67,7 +65,7 @@ namespace BookStoreApp.API.Controllers
         [Route("login")]
         public async Task<ActionResult<AuthResponse>> Login(LoginUserDto userDto)
         {
-            Logger.LogInformation($"Login Attempt for {userDto.Email} ");
+            logger.LogInformation($"Login Attempt for {userDto.Email} ");
             try
             {
                 var user = await userManager.FindByEmailAsync(userDto.Email);
@@ -91,12 +89,10 @@ namespace BookStoreApp.API.Controllers
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, $"Something Went Wrong in the {nameof(Register)}");
+                logger.LogError(ex, $"Something Went Wrong in the {nameof(Register)}");
                 return Problem($"Something Went Wrong in the {nameof(Register)}", statusCode: 500);
             }
         }
-
-
 
         private async Task<string> GenerateToken(ApiUser user)
         {
@@ -128,6 +124,5 @@ namespace BookStoreApp.API.Controllers
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
-
     }
 }

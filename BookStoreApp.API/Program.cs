@@ -1,6 +1,6 @@
 
 using System.Text;
-using BookStoreApp.API.Configuration;
+using BookStoreApp.API.Configurations;
 using BookStoreApp.API.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -15,14 +15,27 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 var constring = builder.Configuration.GetConnectionString("BookStoreAppDb");
 builder.Services.AddDbContext<BookStoreDbContext>(Opt=>Opt.UseSqlServer(constring));
+builder.Services.AddIdentityCore<ApiUser>()
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<BookStoreDbContext>();
+
 builder.Services.AddAutoMapper(typeof(MapperConfig));
+
+builder.Services.AddControllers();
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddIdentityCore<ApiUser>().AddRoles<IdentityRole>().AddEntityFrameworkStores<BookStoreDbContext>();
+
 builder.Host.UseSerilog((ctx, lc) =>
-lc.WriteTo.Console().ReadFrom.Configuration(ctx.Configuration));
-builder.Services.AddCors
-(opt => opt.AddPolicy("AllowAll", b => b.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin()));
+    lc.WriteTo.Console().ReadFrom.Configuration(ctx.Configuration));
+
+builder.Services.AddCors(options => {
+    options.AddPolicy("AllowAll",
+        b => b.AllowAnyMethod()
+        .AllowAnyHeader()
+        .AllowAnyOrigin());
+});
+
 builder.Services.AddAuthentication(options => {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -39,6 +52,7 @@ builder.Services.AddAuthentication(options => {
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Key"]))
     };
 });
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -49,8 +63,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 
 app.UseCors("AllowAll");
+
 app.UseAuthentication();
 app.UseAuthorization();
 

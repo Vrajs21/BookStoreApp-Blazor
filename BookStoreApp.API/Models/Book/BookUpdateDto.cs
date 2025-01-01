@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BookStoreApp.API.Model.Book
+namespace BookStoreApp.API.Models.Book
 {
-    public class BookCreateDto
+    public class BookUpdateDto : BaseDto
     {
         [Required]
         public int AuthorId { get; set; }
@@ -12,7 +12,7 @@ namespace BookStoreApp.API.Model.Book
         public string Title { get; set; }
 
         [Required]
-        [Range(1000, int.MaxValue)]
+        [Range(1800, int.MaxValue)]
         public int Year { get; set; }
 
         [Required]
@@ -22,6 +22,7 @@ namespace BookStoreApp.API.Model.Book
         [StringLength(250, MinimumLength = 10)]
         public string Summary { get; set; }
 
+        public string? Image { get; set; }
         public string? ImageData { get; set; }
         public string? OriginalImageName { get; set; }
 

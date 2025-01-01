@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BookStoreApp.API.Model.Author
+namespace BookStoreApp.API.Models.Author
 {
     public class AuthorReadOnlyDto : BaseDto
     {

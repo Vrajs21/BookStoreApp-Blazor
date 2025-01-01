@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BookStoreApp.API.Model.Author
+namespace BookStoreApp.API.Models.Author
 {
     public class AuthorCreateDto
     {
@@ -13,6 +13,6 @@ namespace BookStoreApp.API.Model.Author
         public string LastName { get; set; }
 
         [StringLength(250)]
-        public string Bio { get; set; }
+        public string? Bio { get; set; }
     }
 }
